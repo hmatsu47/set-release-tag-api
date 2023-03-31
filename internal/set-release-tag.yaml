@@ -1,0 +1,122 @@
+openapi: 3.0.0
+x-stoplight:
+  id: xxup260k9igfh
+info:
+  title: set-release-tag
+  version: '1.0'
+  contact:
+    name: Hiroyasu Matsuhisa
+    url: 'https://github.com/hmatsu47'
+    email: hmatsu47@gmail.com
+  license:
+    name: MIT
+    url: 'https://github.com/hmatsu47/select-repository-app/blob/master/LICENSE'
+  description: リリースタグセット用API
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /images:
+    get:
+      summary: コンテナイメージ一覧の取得
+      responses:
+        '200':
+          $ref: '#/components/responses/imagesResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      operationId: getImages
+      description: コンテナイメージ一覧の取得
+      tags:
+        - image
+    parameters: []
+    post:
+      summary: リリースタグセット
+      operationId: postImages
+      responses:
+        '200':
+          $ref: '#/components/responses/imagesResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      description: リリースタグセット
+      requestBody:
+        $ref: '#/components/requestBodies/imagesRequest'
+      tags:
+        - image
+components:
+  schemas:
+    Image:
+      title: Image
+      x-stoplight:
+        id: gruge0rnxfnfp
+      type: object
+      x-internal: false
+      description: コンテナイメージモデル
+      properties:
+        tags:
+          type: array
+          items:
+            type: string
+        size:
+          type: number
+        repository_name:
+          type: string
+        digest:
+          type: string
+        pushed_at:
+          type: string
+          format: date-time
+      required:
+        - tags
+        - size
+        - repository_name
+        - digest
+        - pushed_at
+    Error:
+      title: Error
+      x-stoplight:
+        id: l8zmsibh2bdic
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+      description: エラーメッセージモデル
+    ImageTag:
+      title: ImageTag
+      x-stoplight:
+        id: xm55mzqoqrrs3
+      type: object
+      properties:
+        tag:
+          type: string
+          x-stoplight:
+            id: k25whfzf51y3r
+      required:
+        - tag
+  parameters: {}
+  requestBodies:
+    imagesRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ImageTag'
+      description: リリースタグセットリクエストボディ
+  responses:
+    imagesResponse:
+      description: コンテナイメージ一覧レスポンスボディ
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Image'
+    errorResponse:
+      description: エラーメッセージレスポンスボディ
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes: {}
+tags:
+  - name: image
+    description: コンテナイメージ
