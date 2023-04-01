@@ -45,7 +45,7 @@ func main() {
 	// リポジトリ URI・付与するタグはコマンドラインパラメータで取得
 	repositoryUri := flag.Arg(0)
 	if repositoryUri == "" {
-		repositoryUri = "postfix-common"
+		panic("リポジトリの指定がありません")
 	}
 	tagName := flag.Arg(1)
 	if tagName == "" {
