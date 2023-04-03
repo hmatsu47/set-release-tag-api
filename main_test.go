@@ -180,7 +180,9 @@ func TestSetReleaseTag1(t *testing.T) {
 		assert.Equal(t, 1, len(imageList[1].Tags))
 		assert.Equal(t, tag2, imageList[1].Tags[0])
 	})
+}
 
+func TestSetReleaseTag2(t *testing.T) {
 	// t.Run("イメージ取得（モック利用／2つ中1つがタグ付き）", func(t *testing.T) {
 	// 	// テスト用の ListImages の結果を生成
 	// 	digest1 := "sha256:4d2653f861f1c4cb187f1a61f97b9af7adec9ec1986d8e253052cfa60fd7372f"

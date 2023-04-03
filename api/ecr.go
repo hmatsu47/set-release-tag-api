@@ -135,21 +135,16 @@ func GetImageList(imageIds []types.ImageIdentifier, imageDetails []types.ImageDe
 }
 
 // ECR リポジトリ内イメージ一覧取得
-func ImageList(repositoryUri string) ([]Image, error) {
+func ImageList(ctx context.Context, api *ecr.Client, repositoryUri string) ([]Image, error) {
 	var err error
-	region := strings.Split(repositoryUri, ".")[3]
 	repositoryName := strings.Split(repositoryUri, "/")[1]
 	registryId := strings.Split(repositoryUri, ".")[0]
-	ecrClient, err := EcrClient(region)
-	if err != nil {
-		return nil, err
-	}
 
-	imageIds, err := EcrListImages(context.TODO(), ecrClient, repositoryName, registryId)
+	imageIds, err := EcrListImages(ctx, api, repositoryName, registryId)
 	if err != nil {
 		return nil, err
 	}
-	imageDetails, err := EcrDescribeImages(context.TODO(), ecrClient, repositoryName, registryId)
+	imageDetails, err := EcrDescribeImages(ctx, api, repositoryName, registryId)
 	if err != nil {
 		return nil, err
 	}
@@ -159,23 +154,18 @@ func ImageList(repositoryUri string) ([]Image, error) {
 }
 
 // 対象タグを持つイメージにリリースタグを付加
-func SetTag(repositoryUri string, attachTagName string, selectedTagName string) error {
+func SetTag(ctx context.Context, api *ecr.Client, repositoryUri string, attachTagName string, selectedTagName string) error {
 	var err error
-	region := strings.Split(repositoryUri, ".")[3]
 	repositoryName := strings.Split(repositoryUri, "/")[1]
 	registryId := strings.Split(repositoryUri, ".")[0]
-	ecrClient, err := EcrClient(region)
-	if err != nil {
-		return err
-	}
 
 	var images []types.Image
-	images, err = EcrBatchGetImage(context.TODO(), ecrClient, repositoryName, registryId, selectedTagName)
+	images, err = EcrBatchGetImage(ctx, api, repositoryName, registryId, selectedTagName)
 	if err != nil {
 		return err
 	}
 
 	imageManifest := *images[0].ImageManifest
-	err = EcrPutImage(context.TODO(), ecrClient, imageManifest, repositoryName, registryId, attachTagName)
+	err = EcrPutImage(ctx, api, imageManifest, repositoryName, registryId, attachTagName)
 	return err
 }
