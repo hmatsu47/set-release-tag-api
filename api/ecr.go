@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ecr"
 	"github.com/aws/aws-sdk-go-v2/service/ecr/types"
@@ -30,9 +31,9 @@ func EcrListImages(ctx context.Context, api EcrListImagesAPI, repositoryName str
 	maxResults := int32(1000)
 
 	ecrImageIds, err := api.ListImages(ctx, &ecr.ListImagesInput{
-		RepositoryName: &repositoryName,
-		RegistryId:     &registryId,
-		MaxResults:     &maxResults,
+		RepositoryName: aws.String(repositoryName),
+		RegistryId:     aws.String(registryId),
+		MaxResults:     aws.Int32(maxResults),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("リポジトリ（%s）のイメージ一覧の取得に失敗しました : %s", repositoryName, err)
@@ -50,9 +51,9 @@ func EcrDescribeImages(ctx context.Context, api EcrDescribeImagesAPI, repository
 	maxResults := int32(1000)
 
 	ecrImages, err := api.DescribeImages(ctx, &ecr.DescribeImagesInput{
-		RepositoryName: &repositoryName,
-		RegistryId:     &registryId,
-		MaxResults:     &maxResults,
+		RepositoryName: aws.String(repositoryName),
+		RegistryId:     aws.String(registryId),
+		MaxResults:     aws.Int32(maxResults),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("リポジトリ（%s）のイメージ詳細一覧の取得に失敗しました : %s", repositoryName, err)
@@ -68,12 +69,12 @@ type EcrBatchGetImageAPI interface {
 func EcrBatchGetImage(ctx context.Context, api EcrBatchGetImageAPI, repositoryName string, registryId string, selectedTagName string) ([]types.Image, error) {
 	var imageIds []types.ImageIdentifier
 	imageIds = append(imageIds, types.ImageIdentifier{
-		ImageTag: &selectedTagName,
+		ImageTag: aws.String(selectedTagName),
 	})
 	ecrImage, err := api.BatchGetImage(ctx, &ecr.BatchGetImageInput{
 		ImageIds:       imageIds,
-		RepositoryName: &repositoryName,
-		RegistryId:     &registryId,
+		RepositoryName: aws.String(repositoryName),
+		RegistryId:     aws.String(registryId),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("リポジトリ（%s）のイメージ情報の取得に失敗しました : %s", repositoryName, err)
@@ -97,10 +98,10 @@ type EcrPutImageAPI interface {
 
 func EcrPutImage(ctx context.Context, api EcrPutImageAPI, imageManifest string, repositoryName string, registryId string, attachTagName string) error {
 	_, err := api.PutImage(ctx, &ecr.PutImageInput{
-		ImageManifest:  &imageManifest,
-		RepositoryName: &repositoryName,
-		ImageTag:       &attachTagName,
-		RegistryId:     &registryId,
+		ImageManifest:  aws.String(imageManifest),
+		RepositoryName: aws.String(repositoryName),
+		ImageTag:       aws.String(attachTagName),
+		RegistryId:     aws.String(registryId),
 	})
 	return err
 }
@@ -117,10 +118,10 @@ func GetImageList(imageIds []types.ImageIdentifier, imageDetails []types.ImageDe
 			pushedAt := v.ImagePushedAt
 			size := v.ImageSizeInBytes
 			image := Image{
-				Digest:         *digest,
-				PushedAt:       *pushedAt,
+				Digest:         aws.ToString(digest),
+				PushedAt:       aws.ToTime(pushedAt),
 				RepositoryName: repositoryName,
-				Size:           float32(*size),
+				Size:           float32(aws.ToInt64(size)),
 				Tags:           tags,
 			}
 			imageList = append(imageList, image)

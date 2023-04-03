@@ -3,6 +3,7 @@ module github.com/hmatsu47/set-release-tag-api
 go 1.18
 
 require (
+	github.com/aws/aws-sdk-go-v2 v1.17.7
 	github.com/aws/aws-sdk-go-v2/config v1.18.19
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.18.7
 	github.com/deepmap/oapi-codegen v1.12.4
@@ -12,7 +13,6 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.17.7 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.18 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.1 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.31 // indirect
