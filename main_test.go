@@ -1,11 +1,15 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
+	// "github.com/aws/aws-sdk-go-v2/aws"
+	// "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/ecr"
 	"github.com/aws/aws-sdk-go-v2/service/ecr/types"
 	"github.com/deepmap/oapi-codegen/pkg/testutil"
 	"github.com/go-playground/assert/v2"
@@ -15,6 +19,34 @@ import (
 func doGet(t *testing.T, handler http.Handler, url string) *httptest.ResponseRecorder {
 	response := testutil.NewRequest().Get(url).WithAcceptJson().GoWithHTTPHandler(t, handler)
 	return response.Recorder
+}
+
+// モック化
+type ECRClientAPI interface {
+	ListImages(ctx context.Context, params *ecr.ListImagesInput, optFns ...func(*ecr.Options)) (*ecr.ListImagesOutput, error)
+	DescribeImages(ctx context.Context, params *ecr.DescribeImagesInput, optFns ...func(*ecr.Options)) (*ecr.DescribeImagesOutput, error)
+	BatchGetImage(ctx context.Context, params *ecr.BatchGetImageInput, optFns ...func(*ecr.Options)) (*ecr.BatchGetImageOutput, error)
+	PutImage(ctx context.Context, params *ecr.PutImageInput, optFns ...func(*ecr.Options)) (*ecr.PutImageOutput, error)
+}
+
+type MockECRClient struct {
+	ECRClientAPI
+	mockListImages     func(ctx context.Context, params *ecr.ListImagesInput, optFns ...func(*ecr.Options)) (*ecr.ListImagesOutput, error)
+	mockDescribeImages func(ctx context.Context, params *ecr.DescribeImagesInput, optFns ...func(*ecr.Options)) (*ecr.DescribeImagesOutput, error)
+	mockBatchGetImage  func(ctx context.Context, params *ecr.BatchGetImageInput, optFns ...func(*ecr.Options)) (*ecr.BatchGetImageOutput, error)
+	mockPutImage       func(ctx context.Context, params *ecr.PutImageInput, optFns ...func(*ecr.Options)) (*ecr.PutImageOutput, error)
+}
+
+func (m *MockECRClient) ListImages(ctx context.Context, params *ecr.ListImagesInput, optFns ...func(*ecr.Options)) (*ecr.ListImagesOutput, error) {
+	return m.mockListImages(ctx, params, optFns...)
+}
+
+func (m *MockECRClient) DescribeImages(ctx context.Context, params *ecr.DescribeImagesInput, optFns ...func(*ecr.Options)) (*ecr.DescribeImagesOutput, error) {
+	return m.mockDescribeImages(ctx, params, optFns...)
+}
+
+func (m *MockECRClient) BatchGetImage(ctx context.Context, params *ecr.BatchGetImageInput, optFns ...func(*ecr.Options)) (*ecr.BatchGetImageOutput, error) {
+	return m.mockBatchGetImage(ctx, params, optFns...)
 }
 
 // go test -v で実行する
@@ -41,7 +73,7 @@ func TestSetReleaseTag1(t *testing.T) {
 		expectedTime1, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2022-09-02T05:27:02Z")
 		expectedTime2, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2022-09-02T05:07:10Z")
 		registryId := "000000000000"
-		repositoryName := "repository33"
+		repositoryName := "repository1"
 		size1 := float32(10017365)
 		size1Int64 := int64(10017365)
 		var tags1 []string
@@ -103,7 +135,7 @@ func TestSetReleaseTag1(t *testing.T) {
 		expectedTime1, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2022-09-02T05:27:02Z")
 		expectedTime2, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2022-09-02T05:07:10Z")
 		registryId := "000000000000"
-		repositoryName := "repository33"
+		repositoryName := "repository1"
 		size1 := float32(10017365)
 		size1Int64 := int64(10017365)
 		var tags1 []string
@@ -149,4 +181,67 @@ func TestSetReleaseTag1(t *testing.T) {
 		assert.Equal(t, 1, len(imageList[1].Tags))
 		assert.Equal(t, tag2, imageList[1].Tags[0])
 	})
+
+	// // モッククライアントの定義
+	// mockECR := &MockECRClient{
+	// 	mockListImages: func(ctx context.Context, params *ecr.ListImagesInput, optFns ...func(*ecr.Options)) (*ecr.ListImagesOutput, error) {
+	// 		RepositoryName := aws.toString(&ecr.ListImagesInput.RepositoryName)
+	// 		RegistryId := aws.toString(&ecr.ListImagesInput.RepositoryName)
+	// 		MaxResults := aws.toString(&ecr.ListImagesInput.RepositoryName)
+	// 		return &ecr.ListImagesOutput{
+	// 			ImageIds: []types.ImageIdentifier{
+	// 				{
+	// 					ImageDigest: aws.String("digest1"),
+	// 					ImageTag:    aws.String("tag1"),
+	// 				},
+	// 				{
+	// 					ImageDigest: aws.String("digest2"),
+	// 					ImageTag:    aws.String("tag2"),
+	// 				},
+	// 			},
+	// 		}, nil
+	// 	},
+	// 	mockDescribeImages: func(ctx context.Context, params *ecr.DescribeImagesInput, optFns ...func(*ecr.Options)) (*ecr.DescribeImagesOutput, error) {
+	// 		return &ecr.DescribeImagesOutput{
+	// 			ImageDetails: []types.ImageDetail{
+	// 				{
+	// 					ImageDigest: aws.String("digest1"),
+	// 					ImageTags:   []string{"tag1"},
+	// 				},
+	// 				{
+	// 					ImageDigest: aws.String("digest2"),
+	// 					ImageTags:   []string{"tag2"},
+	// 				},
+	// 			},
+	// 		}, nil
+	// 	},
+	// 	mockBatchGetImage: func(ctx context.Context, params *ecr.BatchGetImageInput, optFns ...func(*ecr.Options)) (*ecr.BatchGetImageOutput, error) {
+	// 		return &ecr.BatchGetImageOutput{
+	// 			Images: []types.Image{
+	// 				{
+	// 					ImageId: &types.ImageIdentifier{
+	// 						ImageDigest: aws.String("digest1"),
+	// 						ImageTag:    aws.String("tag1"),
+	// 					},
+	// 				},
+	// 				{
+	// 					ImageId: &types.ImageIdentifier{
+	// 						ImageDigest: aws.String("digest2"),
+	// 						ImageTag:    aws.String("tag2"),
+	// 					},
+	// 				},
+	// 			},
+	// 		}, nil
+	// 	},
+	// 	mockPutImage: func(ctx context.Context, params *ecr.PutImageInput, optFns ...func(*ecr.Options)) (*ecr.PutImageOutput, error) {
+	// 		return &ecr.PutImageOutput{
+	// 			Image: &types.Image{
+	// 				ImageId: &types.ImageIdentifier{
+	// 					ImageDigest: aws.String("new-digest"),
+	// 					ImageTag:    aws.String("new-tag"),
+	// 				},
+	// 			},
+	// 		}, nil
+	// 	},
+	// }
 }
