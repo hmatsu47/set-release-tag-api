@@ -136,7 +136,6 @@ func GetImageList(imageIds []types.ImageIdentifier, imageDetails []types.ImageDe
 
 // ECR リポジトリ内イメージ一覧取得
 func ImageList(ctx context.Context, api *ecr.Client, repositoryUri string) ([]Image, error) {
-	var err error
 	repositoryName := strings.Split(repositoryUri, "/")[1]
 	registryId := strings.Split(repositoryUri, ".")[0]
 
@@ -155,12 +154,10 @@ func ImageList(ctx context.Context, api *ecr.Client, repositoryUri string) ([]Im
 
 // 対象タグを持つイメージにリリースタグを付加
 func SetTag(ctx context.Context, api *ecr.Client, repositoryUri string, attachTagName string, selectedTagName string) error {
-	var err error
 	repositoryName := strings.Split(repositoryUri, "/")[1]
 	registryId := strings.Split(repositoryUri, ".")[0]
 
-	var images []types.Image
-	images, err = EcrBatchGetImage(ctx, api, repositoryName, registryId, selectedTagName)
+	images, err := EcrBatchGetImage(ctx, api, repositoryName, registryId, selectedTagName)
 	if err != nil {
 		return err
 	}
