@@ -8,7 +8,7 @@ import (
 )
 
 // モックパラメーター
-type ParamsECRMock struct {
+type ECRParams struct {
     RepositoryName  string
     RegistryId      string
     ImageIds        []types.ImageIdentifier
@@ -21,7 +21,7 @@ type ParamsECRMock struct {
 
 // モック生成用
 type MockECRParams struct {
-    ParamsECRMock   ParamsECRMock
+    ECRParams       ECRParams
 }
 
 // モック化

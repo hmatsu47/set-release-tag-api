@@ -213,7 +213,7 @@ func TestSetReleaseTag2(t *testing.T) {
 	images = append(images, image1)
 
 	// テストケース
-	testParams := testdouble.ParamsECRMock{
+	testParams := testdouble.ECRParams{
 		RepositoryName:     repositoryName,
 		RegistryId:         registryId,
 		ImageIds:           imageIds,
@@ -224,7 +224,7 @@ func TestSetReleaseTag2(t *testing.T) {
 		Images:             images,
 	}
 	mockParams := testdouble.MockECRParams{
-		ParamsECRMock: testParams,
+		ECRParams: testParams,
 	}
 
 	t.Run("イメージ取得（モック利用／2つ中1つがタグ付き）", func(t *testing.T) {
@@ -320,7 +320,7 @@ func TestSetReleaseTag3(t *testing.T) {
 	images = append(images, image1)
 
 	// テストケース
-	testParams := testdouble.ParamsECRMock{
+	testParams := testdouble.ECRParams{
 		RepositoryName:     repositoryName,
 		RegistryId:         registryId,
 		ImageIds:           imageIds,
@@ -331,7 +331,7 @@ func TestSetReleaseTag3(t *testing.T) {
 		Images:             images,
 	}
 	mockParams := testdouble.MockECRParams{
-		ParamsECRMock: testParams,
+		ECRParams: testParams,
 	}
 
 	t.Run("イメージ取得（モック利用／2つ中2つがタグ付き）", func(t *testing.T) {
