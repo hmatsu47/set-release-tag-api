@@ -12,6 +12,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecr/types"
 )
 
+// ECR API interface
+type ECRAPI interface {
+	EcrListImagesAPI
+	EcrDescribeImagesAPI
+	EcrBatchGetImageAPI
+	EcrPutImageAPI
+}
+
 // ECR クライアント生成
 func EcrClient(region string) (*ecr.Client, error) {
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(region))
@@ -135,7 +143,7 @@ func GetImageList(imageIds []types.ImageIdentifier, imageDetails []types.ImageDe
 }
 
 // ECR リポジトリ内イメージ一覧取得
-func ImageList(ctx context.Context, api *ecr.Client, repositoryUri string) ([]Image, error) {
+func ImageList(ctx context.Context, api ECRAPI, repositoryUri string) ([]Image, error) {
 	repositoryName := strings.Split(repositoryUri, "/")[1]
 	registryId := strings.Split(repositoryUri, ".")[0]
 
@@ -153,7 +161,7 @@ func ImageList(ctx context.Context, api *ecr.Client, repositoryUri string) ([]Im
 }
 
 // 対象タグを持つイメージにリリースタグを付加
-func SetTag(ctx context.Context, api *ecr.Client, repositoryUri string, attachTagName string, selectedTagName string) error {
+func SetTag(ctx context.Context, api ECRAPI, repositoryUri string, attachTagName string, selectedTagName string) error {
 	repositoryName := strings.Split(repositoryUri, "/")[1]
 	registryId := strings.Split(repositoryUri, ".")[0]
 
