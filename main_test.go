@@ -64,7 +64,7 @@ func TestSetReleaseTag1(t *testing.T) {
 		imageDetails = append(imageDetails, imageDetail2)
 
 		repositoryUri := "000000000000.dkr.ecr.ap-northeast-1.amazonaws.com/repository1"
-		imageList := api.GetImageList(imageIds, imageDetails, repositoryName, repositoryUri)
+		imageList := api.GetImageList(imageDetails, repositoryName, repositoryUri)
 		assert.Equal(t, 1, len(imageList))
 		assert.Equal(t, digest1, imageList[0].Digest)
 		assert.Equal(t, expectedTime1, imageList[0].PushedAt)
@@ -130,7 +130,7 @@ func TestSetReleaseTag1(t *testing.T) {
 		imageDetails = append(imageDetails, imageDetail2)
 
 		repositoryUri := "000000000000.dkr.ecr.ap-northeast-1.amazonaws.com/repository1"
-		imageList := api.GetImageList(imageIds, imageDetails, repositoryName, repositoryUri)
+		imageList := api.GetImageList(imageDetails, repositoryName, repositoryUri)
 		assert.Equal(t, 2, len(imageList))
 		assert.Equal(t, digest2, imageList[0].Digest)
 		assert.Equal(t, expectedTime2, imageList[0].PushedAt)

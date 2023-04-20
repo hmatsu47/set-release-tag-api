@@ -14,7 +14,6 @@ import (
 
 // ECR API interface
 type ECRAPI interface {
-	EcrListImagesAPI
 	EcrDescribeImagesAPI
 	EcrBatchGetImageAPI
 	EcrPutImageAPI
@@ -27,26 +26,6 @@ func EcrClient(region string) (*ecr.Client, error) {
 		return nil, fmt.Errorf("AWS（API）の認証に失敗しました : %s", err)
 	}
 	return ecr.NewFromConfig(cfg), nil
-}
-
-// ECR ListImages
-type EcrListImagesAPI interface {
-	ListImages(ctx context.Context, params *ecr.ListImagesInput, optFns ...func(*ecr.Options)) (*ecr.ListImagesOutput, error)
-}
-
-func EcrListImages(ctx context.Context, api EcrListImagesAPI, repositoryName string, registryId string) ([]types.ImageIdentifier, error) {
-	// ページネーションさせないために最大件数を 1,000 に（実際には数十個程度の想定）
-	maxResults := int32(1000)
-
-	ecrImageIds, err := api.ListImages(ctx, &ecr.ListImagesInput{
-		RepositoryName: aws.String(repositoryName),
-		RegistryId:     aws.String(registryId),
-		MaxResults:     aws.Int32(maxResults),
-	})
-	if err != nil {
-		return nil, fmt.Errorf("リポジトリ（%s）のイメージ一覧の取得に失敗しました : %s", repositoryName, err)
-	}
-	return ecrImageIds.ImageIds, nil
 }
 
 // ECR DescribeImages
@@ -115,7 +94,7 @@ func EcrPutImage(ctx context.Context, api EcrPutImageAPI, imageManifest string, 
 }
 
 // ImageList を取得
-func GetImageList(imageIds []types.ImageIdentifier, imageDetails []types.ImageDetail, repositoryName string, repositoryUri string) []Image {
+func GetImageList(imageDetails []types.ImageDetail, repositoryName string, repositoryUri string) []Image {
 	var imageList []Image
 	for _, v := range imageDetails {
 		tags := v.ImageTags
@@ -147,16 +126,12 @@ func ImageList(ctx context.Context, api ECRAPI, repositoryUri string) ([]Image, 
 	repositoryName := strings.Split(repositoryUri, "/")[1]
 	registryId := strings.Split(repositoryUri, ".")[0]
 
-	imageIds, err := EcrListImages(ctx, api, repositoryName, registryId)
-	if err != nil {
-		return nil, err
-	}
 	imageDetails, err := EcrDescribeImages(ctx, api, repositoryName, registryId)
 	if err != nil {
 		return nil, err
 	}
 
-	imageList := GetImageList(imageIds, imageDetails, repositoryName, repositoryUri)
+	imageList := GetImageList(imageDetails, repositoryName, repositoryUri)
 	return imageList, nil
 }
 
