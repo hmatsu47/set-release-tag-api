@@ -9,46 +9,40 @@ import (
 
 // モックパラメーター
 type ECRParams struct {
-    RepositoryName  string
-    RegistryId      string
-    ImageIds        []types.ImageIdentifier
-    ImageDetails    []types.ImageDetail
-    MaxResults      int32
-    AttachTagName   string
-    SelectedTagName string
-    Images          []types.Image
+	RepositoryName  string
+	RegistryId      string
+	ImageIds        []types.ImageIdentifier
+	ImageDetails    []types.ImageDetail
+	MaxResults      int32
+	AttachTagName   string
+	SelectedTagName string
+	Images          []types.Image
 }
 
 // モック生成用
 type MockECRParams struct {
-    ECRParams       ECRParams
+	ECRParams ECRParams
 }
 
 // モック化
 type MockECRAPI struct {
-    ListImagesAPI       MockECRListImagesAPI
-    DescribeImagesAPI   MockECRDescribeImagesAPI
-    BatchGetImageAPI    MockECRBatchGetImageAPI
-    PutImageAPI         MockECRPutImageAPI
+	DescribeImagesAPI MockECRDescribeImagesAPI
+	BatchGetImageAPI  MockECRBatchGetImageAPI
+	PutImageAPI       MockECRPutImageAPI
 }
 
-type MockECRListImagesAPI       func(ctx context.Context, params *ecr.ListImagesInput, optFns ...func(*ecr.Options)) (*ecr.ListImagesOutput, error)
-type MockECRDescribeImagesAPI   func(ctx context.Context, params *ecr.DescribeImagesInput, optFns ...func(*ecr.Options)) (*ecr.DescribeImagesOutput, error)
-type MockECRBatchGetImageAPI    func(ctx context.Context, params *ecr.BatchGetImageInput, optFns ...func(*ecr.Options)) (*ecr.BatchGetImageOutput, error)
-type MockECRPutImageAPI         func(ctx context.Context, params *ecr.PutImageInput, optFns ...func(*ecr.Options)) (*ecr.PutImageOutput, error)
-
-func (m MockECRAPI) ListImages(ctx context.Context, params *ecr.ListImagesInput, optFns ...func(*ecr.Options)) (*ecr.ListImagesOutput, error) {
-    return m.ListImagesAPI(ctx, params, optFns...)
-}
+type MockECRDescribeImagesAPI func(ctx context.Context, params *ecr.DescribeImagesInput, optFns ...func(*ecr.Options)) (*ecr.DescribeImagesOutput, error)
+type MockECRBatchGetImageAPI func(ctx context.Context, params *ecr.BatchGetImageInput, optFns ...func(*ecr.Options)) (*ecr.BatchGetImageOutput, error)
+type MockECRPutImageAPI func(ctx context.Context, params *ecr.PutImageInput, optFns ...func(*ecr.Options)) (*ecr.PutImageOutput, error)
 
 func (m MockECRAPI) DescribeImages(ctx context.Context, params *ecr.DescribeImagesInput, optFns ...func(*ecr.Options)) (*ecr.DescribeImagesOutput, error) {
-    return m.DescribeImagesAPI(ctx, params, optFns...)
+	return m.DescribeImagesAPI(ctx, params, optFns...)
 }
 
 func (m MockECRAPI) BatchGetImage(ctx context.Context, params *ecr.BatchGetImageInput, optFns ...func(*ecr.Options)) (*ecr.BatchGetImageOutput, error) {
-    return m.BatchGetImageAPI(ctx, params, optFns...)
+	return m.BatchGetImageAPI(ctx, params, optFns...)
 }
 
 func (m MockECRAPI) PutImage(ctx context.Context, params *ecr.PutImageInput, optFns ...func(*ecr.Options)) (*ecr.PutImageOutput, error) {
-    return m.PutImageAPI(ctx, params, optFns...)
+	return m.PutImageAPI(ctx, params, optFns...)
 }
