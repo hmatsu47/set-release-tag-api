@@ -15,24 +15,10 @@ import (
 // go test -v で実行する
 func TestSetReleaseTag1(t *testing.T) {
 	t.Run("イメージ取得（GetImageListのみ／2つ中1つがタグ付き）", func(t *testing.T) {
-		// テスト用の ListImages の結果を生成
+		// テスト用の DescribeImages の結果を生成
 		digest1 := "sha256:4d2653f861f1c4cb187f1a61f97b9af7adec9ec1986d8e253052cfa60fd7372f"
 		tag1 := "latest"
-		imageId1 :=
-			types.ImageIdentifier{
-				ImageDigest: aws.String(digest1),
-				ImageTag:    aws.String(tag1),
-			}
 		digest2 := "sha256:20b39162cb057eab7168652ab012ae3712f164bf2b4ef09e6541fca4ead3df62"
-		imageId2 :=
-			types.ImageIdentifier{
-				ImageDigest: aws.String(digest2),
-			}
-		var imageIds []types.ImageIdentifier
-		imageIds = append(imageIds, imageId1)
-		imageIds = append(imageIds, imageId2)
-
-		// テスト用の DescribeImages の結果を生成
 		expectedTime1, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2022-09-02T05:27:02Z")
 		expectedTime2, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2022-09-02T05:07:10Z")
 		registryId := "000000000000"
@@ -75,26 +61,11 @@ func TestSetReleaseTag1(t *testing.T) {
 	})
 
 	t.Run("イメージ取得（GetImageListのみ／2つ中2つがタグ付き）", func(t *testing.T) {
-		// テスト用の ListImages の結果を生成
+		// テスト用の DescribeImages の結果を生成
 		digest1 := "sha256:4d2653f861f1c4cb187f1a61f97b9af7adec9ec1986d8e253052cfa60fd7372f"
 		tag1 := "latest"
-		imageId1 :=
-			types.ImageIdentifier{
-				ImageDigest: aws.String(digest1),
-				ImageTag:    aws.String(tag1),
-			}
 		digest2 := "sha256:20b39162cb057eab7168652ab012ae3712f164bf2b4ef09e6541fca4ead3df62"
 		tag2 := "old"
-		imageId2 :=
-			types.ImageIdentifier{
-				ImageDigest: aws.String(digest2),
-				ImageTag:    aws.String(tag2),
-			}
-		var imageIds []types.ImageIdentifier
-		imageIds = append(imageIds, imageId1)
-		imageIds = append(imageIds, imageId2)
-
-		// テスト用の DescribeImages の結果を生成
 		expectedTime1, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2022-09-02T05:07:10Z")
 		expectedTime2, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2022-09-02T05:27:02Z")
 		registryId := "000000000000"
@@ -214,14 +185,14 @@ func TestSetReleaseTag2(t *testing.T) {
 
 	// テストケース
 	testParams := testdouble.ECRParams{
-		RepositoryName:     repositoryName,
-		RegistryId:         registryId,
-		ImageIds:           imageIds,
-		ImageDetails:       imageDetails,
-		MaxResults:         maxResults,
-		AttachTagName:      attachTagName,
-		SelectedTagName:    selectedTagName,
-		Images:             images,
+		RepositoryName:  repositoryName,
+		RegistryId:      registryId,
+		ImageIds:        imageIds,
+		ImageDetails:    imageDetails,
+		MaxResults:      maxResults,
+		AttachTagName:   attachTagName,
+		SelectedTagName: selectedTagName,
+		Images:          images,
 	}
 	mockParams := testdouble.MockECRParams{
 		ECRParams: testParams,
@@ -321,14 +292,14 @@ func TestSetReleaseTag3(t *testing.T) {
 
 	// テストケース
 	testParams := testdouble.ECRParams{
-		RepositoryName:     repositoryName,
-		RegistryId:         registryId,
-		ImageIds:           imageIds,
-		ImageDetails:       imageDetails,
-		MaxResults:         maxResults,
-		AttachTagName:      attachTagName,
-		SelectedTagName:    selectedTagName,
-		Images:             images,
+		RepositoryName:  repositoryName,
+		RegistryId:      registryId,
+		ImageIds:        imageIds,
+		ImageDetails:    imageDetails,
+		MaxResults:      maxResults,
+		AttachTagName:   attachTagName,
+		SelectedTagName: selectedTagName,
+		Images:          images,
 	}
 	mockParams := testdouble.MockECRParams{
 		ECRParams: testParams,
