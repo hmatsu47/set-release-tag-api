@@ -187,7 +187,6 @@ func TestSetReleaseTag2(t *testing.T) {
 	testParams := testdouble.ECRParams{
 		RepositoryName:  repositoryName,
 		RegistryId:      registryId,
-		ImageIds:        imageIds,
 		ImageDetails:    imageDetails,
 		MaxResults:      maxResults,
 		AttachTagName:   attachTagName,
@@ -294,7 +293,6 @@ func TestSetReleaseTag3(t *testing.T) {
 	testParams := testdouble.ECRParams{
 		RepositoryName:  repositoryName,
 		RegistryId:      registryId,
-		ImageIds:        imageIds,
 		ImageDetails:    imageDetails,
 		MaxResults:      maxResults,
 		AttachTagName:   attachTagName,

@@ -11,7 +11,6 @@ import (
 type ECRParams struct {
 	RepositoryName  string
 	RegistryId      string
-	ImageIds        []types.ImageIdentifier
 	ImageDetails    []types.ImageDetail
 	MaxResults      int32
 	AttachTagName   string
